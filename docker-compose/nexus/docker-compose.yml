@@ -5,18 +5,12 @@ services:
     restart: unless-stopped
     # Nexus official UID is 200
     user: "200:200"
+    entrypoint: ["/entrypoint.sh"]
     environment:
-      INSTALL4J_ADD_VM_PARAMS: >-
-        -Xms2703m
-        -Xmx2703m
-        -XX:MaxDirectMemorySize=2703m
-        -Djava.util.prefs.userRoot=/nexus-data/javaprefs
-        -Djava.net.preferIPv4Stack=true
       NEXUS_SECURITY_RANDOMPASSWORD: "false"
     volumes:
       - nexus_data:/nexus-data
-      - ./config/nexus/nexus.properties:/nexus-data/etc/nexus.properties:ro
-      - ./config/nexus/nexus-store.properties:/nexus-data/etc/fabric/nexus-store.properties:ro
+      - ./entrypoint.sh:/entrypoint.sh:ro
       - ./config/logback/logback.xml:/opt/sonatype/nexus/etc/logback/logback.xml:ro
     secrets:
       - pg_user

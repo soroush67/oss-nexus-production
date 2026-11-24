@@ -20,7 +20,9 @@ services:
         -c log_destination=stderr
         -c logging_collector=off
     networks:
-      - infra_net
+      infra_net:
+        aliases:
+          - postgres
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$(cat /run/secrets/pg_user) -d nexus"]
       interval: 10s
