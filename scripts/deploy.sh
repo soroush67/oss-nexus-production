@@ -7,6 +7,10 @@ COMPOSE_DIR="$ROOT_DIR/docker-compose"
 
 log() { echo "[deploy] $*"; }
 
+# Optional flags
+DEPLOY_RUSTFS="${DEPLOY_RUSTFS:-false}"
+DEPLOY_BACKUP="${DEPLOY_BACKUP:-false}"
+
 # 1. Secrets must exist
 if [[ ! -f "$ROOT_DIR/secrets/pg_password.txt" ]]; then
   echo "[deploy] ERROR: secrets not generated. Run: ./scripts/generate-secrets.sh"
@@ -58,6 +62,26 @@ done
 log "Starting Nginx..."
 docker compose -f "$COMPOSE_DIR/nginx/docker-compose.yml" up -d
 
+# 6. Optional: RustFS
+if [[ "$DEPLOY_RUSTFS" == "true" ]]; then
+  if [[ ! -f "$ROOT_DIR/secrets/rustfs_password.txt" ]]; then
+    log "ERROR: rustfs secrets missing. Run: ./scripts/generate-secrets.sh"
+    exit 1
+  fi
+  log "Starting RustFS..."
+  docker compose -f "$COMPOSE_DIR/rustfs/docker-compose.yml" up -d
+  log "RustFS console: http://localhost:9001"
+fi
+
+# 7. Optional: Backup cron
+if [[ "$DEPLOY_BACKUP" == "true" ]]; then
+  log "Starting backup cron..."
+  docker compose -f "$COMPOSE_DIR/backup/docker-compose.yml" up -d
+fi
+
 log ""
 log "Stack is up. Access Nexus at: https://localhost"
 log "Default admin password is in: docker exec nexus_app cat /nexus-data/admin.password"
+log ""
+log "To also start RustFS + backup cron:"
+log "  DEPLOY_RUSTFS=true DEPLOY_BACKUP=true ./scripts/deploy.sh"

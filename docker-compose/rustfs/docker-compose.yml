@@ -1,0 +1,51 @@
+services:
+  rustfs:
+    image: rustfs/rustfs:latest
+    container_name: nexus_rustfs
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      RUSTFS_ROOT_USER_FILE: /run/secrets/rustfs_user
+      RUSTFS_ROOT_PASSWORD_FILE: /run/secrets/rustfs_password
+      RUSTFS_VOLUMES: /data
+      RUSTFS_ADDRESS: ":9000"
+      RUSTFS_CONSOLE_ADDRESS: ":9001"
+    secrets:
+      - rustfs_user
+      - rustfs_password
+    volumes:
+      - rustfs_data:/data
+    networks:
+      - infra_net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:9000/minio/health/live || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          memory: 128M
+    security_opt:
+      - no-new-privileges:true
+
+secrets:
+  rustfs_user:
+    file: ../../secrets/rustfs_user.txt
+  rustfs_password:
+    file: ../../secrets/rustfs_password.txt
+
+volumes:
+  rustfs_data:
+    driver: local
+
+networks:
+  infra_net:
+    external: true
+    name: nexus_infra_net

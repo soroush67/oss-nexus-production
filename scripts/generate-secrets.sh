@@ -14,7 +14,7 @@ if [[ -f "$SECRETS_DIR/pg_user.txt" ]]; then
   echo "[secrets] pg_user.txt already exists — skipping (delete to regenerate)"
 else
   echo -n "nexus" > "$SECRETS_DIR/pg_user.txt"
-  chmod 600 "$SECRETS_DIR/pg_user.txt"
+  chmod 644 "$SECRETS_DIR/pg_user.txt"
 fi
 
 if [[ -f "$SECRETS_DIR/pg_password.txt" ]]; then
@@ -23,8 +23,27 @@ else
   # 32-byte URL-safe random password
   pw=$(LC_ALL=C tr -dc 'A-Za-z0-9!@#%^*_+=' < /dev/urandom | head -c 32)
   echo -n "$pw" > "$SECRETS_DIR/pg_password.txt"
-  chmod 600 "$SECRETS_DIR/pg_password.txt"
+  chmod 644 "$SECRETS_DIR/pg_password.txt"
   echo "[secrets] pg_password.txt created"
+fi
+
+echo "[secrets] Generating RustFS credentials..."
+
+if [[ -f "$SECRETS_DIR/rustfs_user.txt" ]]; then
+  echo "[secrets] rustfs_user.txt already exists — skipping"
+else
+  echo -n "rustfsadmin" > "$SECRETS_DIR/rustfs_user.txt"
+  chmod 644 "$SECRETS_DIR/rustfs_user.txt"
+  echo "[secrets] rustfs_user.txt created"
+fi
+
+if [[ -f "$SECRETS_DIR/rustfs_password.txt" ]]; then
+  echo "[secrets] rustfs_password.txt already exists — skipping"
+else
+  pw=$(LC_ALL=C tr -dc 'A-Za-z0-9!@#%^*_+=' < /dev/urandom | head -c 32)
+  echo -n "$pw" > "$SECRETS_DIR/rustfs_password.txt"
+  chmod 644 "$SECRETS_DIR/rustfs_password.txt"
+  echo "[secrets] rustfs_password.txt created"
 fi
 
 echo "[secrets] Generating self-signed TLS certificate (replace with real cert in production)..."

@@ -1,0 +1,70 @@
+services:
+  backup-cron:
+    image: docker-hosted.hamainsruance.net/alpine:3.21
+    container_name: nexus_backup_cron
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "/backup-entrypoint.sh"]
+    environment:
+      # زمان‌بندی cron — پیش‌فرض: هر روز ساعت 2 بامداد
+      BACKUP_SCHEDULE: "${BACKUP_SCHEDULE:-0 2 * * *}"
+      # آپلود به RustFS فعال/غیرفعال
+      RUSTFS_ENABLED: "${RUSTFS_ENABLED:-false}"
+      RUSTFS_ENDPOINT: "${RUSTFS_ENDPOINT:-http://nexus_rustfs:9000}"
+      RUSTFS_BUCKET: "${RUSTFS_BUCKET:-nexus-backups}"
+      # نگهداری backup (روز)
+      BACKUP_RETENTION_DAYS: "${BACKUP_RETENTION_DAYS:-30}"
+    secrets:
+      - pg_user
+      - pg_password
+      - rustfs_user
+      - rustfs_password
+    volumes:
+      - ./backup-entrypoint.sh:/backup-entrypoint.sh:ro
+      - ../../backups:/backups
+      # دسترسی به nexus_data برای volume backup
+      - nexus_nexus_data:/nexus-data:ro
+    networks:
+      - infra_net
+    depends_on:
+      - postgres_healthcheck_sentinel
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+  # Sentinel که منتظر postgres می‌ماند
+  postgres_healthcheck_sentinel:
+    image: docker-hosted.hamainsruance.net/alpine:3.21
+    container_name: nexus_backup_pg_wait
+    command: >
+      sh -c "
+        until nc -z nexus_postgres 5432; do
+          echo 'waiting for postgres...'; sleep 5;
+        done; echo 'postgres ready'
+      "
+    networks:
+      - infra_net
+    restart: "no"
+
+secrets:
+  pg_user:
+    file: ../../secrets/pg_user.txt
+  pg_password:
+    file: ../../secrets/pg_password.txt
+  rustfs_user:
+    file: ../../secrets/rustfs_user.txt
+  rustfs_password:
+    file: ../../secrets/rustfs_password.txt
+
+volumes:
+  # volume مشترک با nexus compose (external)
+  nexus_nexus_data:
+    external: true
+
+networks:
+  infra_net:
+    external: true
+    name: nexus_infra_net
