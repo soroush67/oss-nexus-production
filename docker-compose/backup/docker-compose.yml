@@ -1,6 +1,6 @@
 services:
   backup-cron:
-    image: docker-hosted.hamainsruance.net/alpine:3.21
+    image: docker-hosted.hamainsruance.net/postgres:18-alpine
     container_name: nexus_backup_cron
     restart: unless-stopped
     entrypoint: ["/bin/sh", "/backup-entrypoint.sh"]

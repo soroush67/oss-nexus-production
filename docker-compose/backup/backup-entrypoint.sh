@@ -2,8 +2,8 @@
 # Cron entrypoint: installs mc if RUSTFS_ENABLED, writes crontab, runs crond
 set -e
 
-# نصب ابزارهای لازم
-apk add --no-cache postgresql-client bash curl 2>/dev/null
+# نصب ابزارهای اضافه (pg_dump از postgres:18-alpine image موجود است)
+apk add --no-cache bash curl wget 2>/dev/null
 
 # نصب mc (MinIO Client) اگر RustFS فعال باشد
 if [ "${RUSTFS_ENABLED}" = "true" ]; then
@@ -19,6 +19,8 @@ if [ "${RUSTFS_ENABLED}" = "true" ]; then
   mc mb --ignore-existing rustfs/"${RUSTFS_BUCKET}" 2>/dev/null || true
   echo "[backup-entrypoint] RustFS configured: ${RUSTFS_ENDPOINT}/${RUSTFS_BUCKET}"
 fi
+
+mkdir -p /scripts
 
 # نوشتن crontab
 echo "${BACKUP_SCHEDULE} /bin/bash /scripts/run-backup.sh >> /var/log/backup.log 2>&1" > /etc/crontabs/root
@@ -40,12 +42,9 @@ echo "[\$(date)] Starting backup..."
 DATE=\$(date +%Y%m%d_%H%M%S)
 mkdir -p /backups
 
-docker_pg_dump() {
-  PGPASSWORD="\${PG_PASS}" pg_dump \
-    -h nexus_postgres -U "\${PG_USER}" -d nexus -Fc \
-    > "/backups/nexus_pg_\${DATE}.dump"
-}
-docker_pg_dump
+PGPASSWORD="\${PG_PASS}" pg_dump \
+  -h nexus_postgres -U "\${PG_USER}" -d nexus -Fc \
+  > "/backups/nexus_pg_\${DATE}.dump"
 echo "[\$(date)] PG dump: /backups/nexus_pg_\${DATE}.dump (\$(du -sh /backups/nexus_pg_\${DATE}.dump | cut -f1))"
 
 # Volume snapshot

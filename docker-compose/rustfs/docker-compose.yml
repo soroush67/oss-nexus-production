@@ -7,8 +7,8 @@ services:
       - "9000:9000"
       - "9001:9001"
     environment:
-      RUSTFS_ROOT_USER_FILE: /run/secrets/rustfs_user
-      RUSTFS_ROOT_PASSWORD_FILE: /run/secrets/rustfs_password
+      RUSTFS_ACCESS_KEY_FILE: /run/secrets/rustfs_user
+      RUSTFS_SECRET_KEY_FILE: /run/secrets/rustfs_password
       RUSTFS_VOLUMES: /data
       RUSTFS_ADDRESS: ":9000"
       RUSTFS_CONSOLE_ADDRESS: ":9001"
