@@ -41,6 +41,39 @@ Internet → Nginx (443/80/8082) → Nexus App (8081) → PostgreSQL (5432)
 docker exec nexus_app cat /nexus-data/admin.password
 ```
 
+## Deploy روی سرور ریموت
+
+```bash
+# پیش‌نیاز: sshpass نصب باشد
+# sudo apt install sshpass
+
+REMOTE_PASS=<password> ./scripts/remote-deploy.sh
+```
+
+متغیرهای قابل تنظیم:
+
+| متغیر | پیش‌فرض | توضیح |
+|-------|---------|-------|
+| `REMOTE_HOST` | `192.168.11.67` | IP سرور هدف |
+| `REMOTE_USER` | `devops` | کاربر SSH |
+| `REMOTE_PASS` | — | رمز SSH (اجباری) |
+| `REMOTE_DIR` | `/home/devops/containerd/nexus` | مسیر نصب روی سرور |
+
+اسکریپت به‌ترتیب انجام می‌دهد:
+1. بررسی اتصال SSH
+2. نصب docker compose plugin روی سرور
+3. ذخیره و انتقال Docker images (~600MB)
+4. انتقال فایل‌های پروژه با rsync
+5. کپی secrets و SSL cert
+6. ایجاد network و volume
+7. اجرای `deploy.sh` روی سرور
+
+**نکته:** RustFS و backup cron به‌صورت پیش‌فرض اجرا نمی‌شوند. بعد از deploy:
+```bash
+REMOTE_PASS=<password> ssh devops@192.168.11.67 \
+  "cd /home/devops/containerd/nexus && DEPLOY_RUSTFS=true DEPLOY_BACKUP=true bash scripts/deploy.sh"
+```
+
 ## مدیریت روزانه
 
 ```bash
