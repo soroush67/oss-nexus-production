@@ -1,6 +1,6 @@
 services:
   nexus:
-    image: sonatype/nexus3:3.80.0
+    image: docker-hosted.hamainsruance.net/sonatype/nexus3:3.80.0
     container_name: nexus_app
     restart: unless-stopped
     # Nexus official UID is 200
@@ -43,7 +43,7 @@ services:
 
   # Sidecar that waits for postgres before nexus starts
   postgres_healthcheck_sentinel:
-    image: alpine:3.21
+    image: docker-hosted.hamainsruance.net/alpine:3.21
     container_name: nexus_pg_wait
     command: >
       sh -c "

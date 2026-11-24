@@ -28,7 +28,7 @@ log "Backing up nexus-data volume..."
 docker run --rm \
   -v nexus_nexus_data:/nexus-data:ro \
   -v "$BACKUP_DIR":/backup \
-  alpine:3.21 \
+  docker-hosted.hamainsruance.net/alpine:3.21 \
   tar -czf "/backup/nexus_data_${DATE}.tar.gz" -C /nexus-data .
 
 log "Volume backup: $BACKUP_DIR/nexus_data_${DATE}.tar.gz ($(du -sh "$BACKUP_DIR/nexus_data_${DATE}.tar.gz" | cut -f1))"
