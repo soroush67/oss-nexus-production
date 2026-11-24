@@ -11,6 +11,7 @@ services:
       RUSTFS_SECRET_KEY_FILE: /run/secrets/rustfs_password
       RUSTFS_VOLUMES: /data
       RUSTFS_ADDRESS: ":9000"
+      RUSTFS_CONSOLE_ENABLE: "true"
       RUSTFS_CONSOLE_ADDRESS: ":9001"
     secrets:
       - rustfs_user
