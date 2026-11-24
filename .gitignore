@@ -1,0 +1,11 @@
+# Never commit secrets or SSL private keys
+secrets/
+docker-compose/nginx/ssl/nexus.key
+docker-compose/nginx/ssl/nexus.crt
+backups/
+
+# OS / editor noise
+.DS_Store
+*.swp
+*.swo
+.env.local

@@ -1,0 +1,58 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: nexus_postgres
+    restart: unless-stopped
+    user: "70:70"
+    environment:
+      POSTGRES_DB: nexus
+      POSTGRES_USER_FILE: /run/secrets/pg_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/pg_password
+    secrets:
+      - pg_user
+      - pg_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d:ro
+      - ./config/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+    command: >
+      postgres
+        -c config_file=/etc/postgresql/postgresql.conf
+        -c log_destination=stderr
+        -c logging_collector=off
+    networks:
+      - infra_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$(cat /run/secrets/pg_user) -d nexus"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          memory: 256M
+    security_opt:
+      - no-new-privileges:true
+    read_only: false
+    tmpfs:
+      - /tmp
+      - /run/postgresql
+
+secrets:
+  pg_user:
+    file: ../../secrets/pg_user.txt
+  pg_password:
+    file: ../../secrets/pg_password.txt
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  infra_net:
+    external: true
+    name: nexus_infra_net

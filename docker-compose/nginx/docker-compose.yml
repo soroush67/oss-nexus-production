@@ -1,0 +1,43 @@
+services:
+  nginx:
+    image: nginx:1.30.7-alpine
+    container_name: nexus_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      # Docker registry port (if needed)
+      - "8082:8082"
+    volumes:
+      - ./conf.d:/etc/nginx/conf.d:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - nginx_cache:/var/cache/nginx
+    networks:
+      - infra_net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost/nginx_status | grep -q 'Active' || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 128M
+        reservations:
+          memory: 64M
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run
+
+volumes:
+  nginx_cache:
+    driver: local
+
+networks:
+  infra_net:
+    external: true
+    name: nexus_infra_net
