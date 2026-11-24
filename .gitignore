@@ -4,6 +4,9 @@ docker-compose/nginx/ssl/nexus.key
 docker-compose/nginx/ssl/nexus.crt
 backups/
 
+# Claude Code local settings (contain machine-specific permission rules)
+.claude/settings.local.json
+
 # OS / editor noise
 .DS_Store
 *.swp

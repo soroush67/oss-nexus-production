@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sshpass -p * ssh * devops@192.168.11.67 *)",
+      "Bash(sshpass -p * scp * devops@192.168.11.67:*)",
+      "Bash(sshpass -p * rsync * devops@192.168.11.67:*)",
+      "Bash(ssh * devops@192.168.11.67 *)",
+      "Bash(scp * devops@192.168.11.67:*)",
+      "Bash(rsync * devops@192.168.11.67:*)"
+    ]
+  }
+}
