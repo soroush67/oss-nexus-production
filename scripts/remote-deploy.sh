@@ -38,10 +38,10 @@ IMAGES_TAR="/tmp/nexus-images.tar"
 
 log "Saving images to ${IMAGES_TAR}..."
 docker save \
-  docker-hosted.hamainsruance.net/sonatype/nexus3:3.80.0 \
-  docker-hosted.hamainsruance.net/postgres:18-alpine \
-  docker-hosted.hamainsruance.net/nginx:1.30.7-alpine \
-  docker-hosted.hamainsruance.net/alpine:3.21 \
+  docker-hosted.hamainsurance.net/sonatype/nexus3:3.80.0 \
+  docker-hosted.hamainsurance.net/postgres:18-alpine \
+  docker-hosted.hamainsurance.net/nginx:1.30.7-alpine \
+  docker-hosted.hamainsurance.net/alpine:3.21 \
   rustfs/rustfs:latest \
   -o "${IMAGES_TAR}"
 

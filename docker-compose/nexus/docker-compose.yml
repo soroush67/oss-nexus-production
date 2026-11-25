@@ -1,6 +1,6 @@
 services:
   nexus:
-    image: docker-hosted.hamainsruance.net/sonatype/nexus3:3.80.0
+    image: docker-hosted.hamainsurance.net/sonatype/nexus3:3.80.0
     container_name: nexus_app
     restart: unless-stopped
     # Nexus official UID is 200
@@ -9,7 +9,7 @@ services:
     environment:
       NEXUS_SECURITY_RANDOMPASSWORD: "false"
     volumes:
-      - nexus_data:/nexus-data
+      - /data/nexus/nexus-data:/nexus-data
       - ./entrypoint.sh:/entrypoint.sh:ro
       - ./config/logback/logback.xml:/opt/sonatype/nexus/etc/logback/logback.xml:ro
     secrets:
@@ -37,7 +37,7 @@ services:
 
   # Sidecar that waits for postgres before nexus starts
   postgres_healthcheck_sentinel:
-    image: docker-hosted.hamainsruance.net/alpine:3.21
+    image: docker-hosted.hamainsurance.net/alpine:3.21
     container_name: nexus_pg_wait
     command: >
       sh -c "
@@ -55,10 +55,6 @@ secrets:
     file: ../../secrets/pg_user.txt
   pg_password:
     file: ../../secrets/pg_password.txt
-
-volumes:
-  nexus_data:
-    driver: local
 
 networks:
   infra_net:

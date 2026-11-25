@@ -17,7 +17,7 @@ services:
       - rustfs_user
       - rustfs_password
     volumes:
-      - rustfs_data:/data
+      - /data/nexus/rustfs:/data
     networks:
       - infra_net
     healthcheck:
@@ -41,10 +41,6 @@ secrets:
     file: ../../secrets/rustfs_user.txt
   rustfs_password:
     file: ../../secrets/rustfs_password.txt
-
-volumes:
-  rustfs_data:
-    driver: local
 
 networks:
   infra_net:

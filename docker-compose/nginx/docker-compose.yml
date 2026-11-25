@@ -1,6 +1,6 @@
 services:
   nginx:
-    image: docker-hosted.hamainsruance.net/nginx:1.30.7-alpine
+    image: docker-hosted.hamainsurance.net/nginx:1.30.7-alpine
     container_name: nexus_nginx
     restart: unless-stopped
     ports:

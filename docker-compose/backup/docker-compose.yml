@@ -1,6 +1,6 @@
 services:
   backup-cron:
-    image: docker-hosted.hamainsruance.net/postgres:18-alpine
+    image: docker-hosted.hamainsurance.net/postgres:18-alpine
     container_name: nexus_backup_cron
     restart: unless-stopped
     entrypoint: ["/bin/sh", "/backup-entrypoint.sh"]
@@ -20,9 +20,9 @@ services:
       - rustfs_password
     volumes:
       - ./backup-entrypoint.sh:/backup-entrypoint.sh:ro
-      - ../../backups:/backups
+      - /data/nexus/backups:/backups
       # دسترسی به nexus_data برای volume backup
-      - nexus_nexus_data:/nexus-data:ro
+      - /data/nexus/nexus-data:/nexus-data:ro
     networks:
       - infra_net
     depends_on:
@@ -37,7 +37,7 @@ services:
 
   # Sentinel که منتظر postgres می‌ماند
   postgres_healthcheck_sentinel:
-    image: docker-hosted.hamainsruance.net/alpine:3.21
+    image: docker-hosted.hamainsurance.net/alpine:3.21
     container_name: nexus_backup_pg_wait
     command: >
       sh -c "
@@ -58,11 +58,6 @@ secrets:
     file: ../../secrets/rustfs_user.txt
   rustfs_password:
     file: ../../secrets/rustfs_password.txt
-
-volumes:
-  # volume مشترک با nexus compose (external)
-  nexus_nexus_data:
-    external: true
 
 networks:
   infra_net:
